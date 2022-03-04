@@ -1,0 +1,112 @@
+    <html>
+        <head>
+        </head>
+        <body>
+
+
+            <canvas style="background-color:#EDEDED; margin-left: 20%;" id="myCanvas" width="550" height="550" style="border:1px solid #d3d3d3;">
+                Your browser does not support the HTML5 canvas tag.</canvas>
+
+            <canvas id="line" width="500" height="200"></canvas>
+            <canvas id="myCanvas1" width="200" height="200"></canvas>
+            <canvas id="myCanvas2" width="200" height="200"></canvas>
+            <canvas id="myCanvas3" width="200" height="200"></canvas>
+            <canvas id="myCanvas4" width="200" height="200"></canvas>
+            <script>
+                var graphValue=
+   [ {id: 1, title: 1, x: 3.9, y: 7, child: [
+{id: 2, title: 2, x: 1.7, y: 7.6 }, {id: 3, title: 3, x: 5.4, y: 2.1 }, {id: 4, title: 4, x: 8.9, y: 8.1}
+]},
+{id: 5, title: 1, x: 3.9, y: 7, child: [
+{id: 6, title: 2, x: 5.9, y: 4.6 }
+]}
+]
+
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+ctx.strokeStyle="white"
+start = 50;
+for(i=1;i<=10;i++){
+
+
+    ctx.beginPath();
+                    ctx.moveTo(50, start * i);
+ctx.lineTo(500 ,start*i);
+ctx.stroke();
+ctx.closePath();
+ctx.beginPath();
+if((10-i)%2 == 0){
+ctx.fillText(10-i, 45, 51*i);
+}
+if(i%2 == 0){
+ctx.fillText(i, 50*i, 510);
+}
+ctx.moveTo(start*i, 50);
+ctx.lineTo(start*i, 500);
+
+ctx.stroke();
+ctx.closePath();
+}
+graphValue.map(item =>{
+ 
+
+    ctx.beginPath();
+    ctx.arc(item.x*50, item.y*50, 30, 0, 2 * Math.PI, false);
+    ctx.fillStyle = '#25404E';
+    ctx.fill();
+    ctx.stroke();
+    ctx.closePath();
+      let ctx2 = c.getContext("2d");
+    ctx2.beginPath()
+    ctx2.fillStyle="white"
+    ctx2.fillText(item.title,item.x*50,item.y*50);
+    item.child.map(children=>{
+        let line = c.getContext("2d");
+        line.beginPath();
+        line.moveTo((item.x*50)+30, item.y*50);
+        line.lineTo((children.x*50)+30, children.y*50);
+        line.stroke();
+        line.closePath();
+        ctx.beginPath();
+    ctx.arc(children.x*50, children.y*50, 30, 0, 2 * Math.PI, false);
+    ctx.fillStyle = '#25404E';
+    ctx.fill();
+    ctx.stroke();
+    ctx.closePath();
+    let ctx2 = c.getContext("2d");
+    ctx2.beginPath()
+    ctx2.fillStyle="white"
+    ctx2.fillText(children.title,children.x*50,children.y*50);
+
+    })
+
+    
+});
+// ctx.beginPath();
+//     ctx.arc(200, 300, 30, 0, 2 * Math.PI, false);
+//     ctx.fillStyle = '#25404E';
+//     ctx.fill();
+//     ctx.stroke();
+//     ctx.closePath();
+//     ctx.beginPath();
+//     ctx.moveTo(230, 300);
+//     ctx.lineTo(290, 400);
+// ctx.stroke();
+// ctx.closePath();
+
+//     ctx.beginPath();
+//     ctx.arc(300, 400, 30, 0, 2 * Math.PI, false);
+//     ctx.fillStyle = '#25404E';
+//     ctx.fill();
+//     ctx.stroke();
+//     ctx.closePath();
+//     var ctx2 = c.getContext("2d");
+//     ctx2.beginPath()
+//     ctx2.fillStyle="white"
+//     ctx2.fillText('sifan',190,300);
+
+
+</script>
+
+        </body>
+    </html>
