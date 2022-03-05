@@ -15,13 +15,10 @@ var mousePosition;
 
 var isMouseDown;
 
-var c = document.getElementById("myCanvas");
+var canvas = document.getElementById("myCanvas");
 var previousPosition = document.getElementById("previousPostion")
 var currentPosition = document.getElementById("currentPosition")
-
-
-var ctx = c.getContext("2d");
-
+var mainCanvas = canvas.getContext("2d");
 document.addEventListener('mousemove', move, false);
 document.addEventListener('mousedown', setDraggable, false);
 document.addEventListener('mouseup', setDraggable, false);
@@ -29,53 +26,54 @@ document.addEventListener('mouseup', setDraggable, false);
 var circles = [];
 var lines = [];
 graphValue.map(item => {
-
     circles.push(new Circle(item.x * 50, item.y * 50, 30, "#25404E", "", true, item.id))
     item.child.map((children, index) => {
-
         lines.push(new line(item.x * 50, item.y * 50, ((children.x * 50)), children.y * 50, item.id, children.id))
         circles.push(new Circle(children.x * 50, children.y * 50, 30, "#25404E", "", false, children.id))
-
-
     })
-  
+
 })
-
-
 //main draw method
-function draw() {
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.strokeStyle = "white"
+function drawGraph() {
     start = 50;
     for (i = 1; i <= 11; i++) {
+        const graphXAxis = canvas.getContext("2d");
+        graphXAxis.strokeStyle = "white"
+        graphXAxis.beginPath();
+        graphXAxis.moveTo(50, start * i);
+        graphXAxis.lineTo(550, start * i);
+        graphXAxis.stroke();
+        graphXAxis.lineWidth = 2
+        graphXAxis.closePath();
 
+        const graphYAxis = canvas.getContext("2d");
+        graphYAxis.strokeStyle = "white"
+        graphYAxis.beginPath();
+        graphYAxis.moveTo(start * i, 50);
+        graphYAxis.lineTo(start * i, 550);
+        graphYAxis.stroke();
+        graphYAxis.closePath();
 
-        ctx.beginPath();
-        ctx.moveTo(50, start * i);
-        ctx.lineTo(550, start * i);
-        ctx.stroke();
-        ctx.lineWidth = 2
-        ctx.closePath();
-        ctx.beginPath();
-        ctx.fillText(0, 40, 550);
-        ctx.fillText(0, 50, 560);
+        const graphAxisTitle = canvas.getContext("2d");
+        graphAxisTitle.beginPath();
+        graphAxisTitle.fillText(0, 40, 550);
+        graphAxisTitle.fillText(0, 50, 560);
         if ((11 - i) % 2 == 0) {
-            ctx.fillText(11 - i, 40, 50 * i);
+            graphAxisTitle.fillText(11 - i, 40, 50 * i);
         }
         if (i % 2 == 0) {
-            ctx.fillText(i, 50 * i, 560);
-            
+            graphAxisTitle.fillText(i, 50 * i, 560);
+
         }
-        ctx.fillStyle="black"
-        ctx.moveTo(start * i, 50);
-        ctx.lineTo(start * i, 550);
-
-        ctx.stroke();
-        ctx.closePath();
+        graphAxisTitle.fillStyle = "black"
+        graphAxisTitle.closePath()
     }
+}
 
+function draw() {
+    mainCanvas.clearRect(0, 0, canvas.width, canvas.height);
+    drawGraph()
     drawCircles()
-
 }
 
 //draw circles
@@ -87,7 +85,6 @@ function drawCircles() {
     for (var j = lines.length - 1; j >= 0; j--) {
         lines[j].draw();
     }
-    console.log(lines)
 }
 
 //key track of circle focus and focused index
@@ -95,11 +92,8 @@ var focused = {
     key: 0,
     state: false
 }
-
-
 //circle Object
 function Circle(x, y, r, fill, stroke, parent, selfId) {
-    console.log(parent)
     this.startingAngle = 0;
     this.endAngle = 2 * Math.PI;
     this.x = x;
@@ -107,23 +101,22 @@ function Circle(x, y, r, fill, stroke, parent, selfId) {
     this.parent = parent
     this.r = r;
     this.selfId = selfId
-
     this.fill = fill;
     this.stroke = stroke;
 
     this.draw = function () {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, this.startingAngle, this.endAngle);
-        ctx.fillStyle = this.fill;
-        ctx.fill();
-        ctx.strokeStyle = this.stroke;
-        let ctx2 = c.getContext("2d");
-        ctx2.beginPath()
-        ctx2.fillStyle = "white"
-        ctx2.fillText(this.selfId, this.x, this.y);
-
-        ctx.stroke();
-        ctx.closePath();
+        const circle = canvas.getContext("2d")
+        circle.beginPath();
+        circle.arc(this.x, this.y, this.r, this.startingAngle, this.endAngle);
+        circle.fillStyle = this.fill;
+        circle.fill();
+        circle.strokeStyle = this.stroke;
+        let circleTitle = canvas.getContext("2d");
+        circleTitle.beginPath()
+        circleTitle.fillStyle = "white"
+        circleTitle.fillText(this.selfId, this.x, this.y);
+        circle.stroke();
+        circle.closePath();
 
     }
 }
@@ -138,15 +131,15 @@ function line(x, y, x1, y1, parent, selfId) {
     this.selfId = selfId
 
     this.draw = function () {
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x1, this.y1);
-        ctx.stroke();
-        ctx.strokeStyle="grey"
-        ctx.closePath();
+        const line = canvas.getContext("2d")
+        line.beginPath();
+        line.moveTo(this.x, this.y);
+        line.lineTo(this.x1, this.y1);
+        line.stroke();
+        line.strokeStyle = "grey"
+        line.closePath();
     }
 }
-
 function move(e) {
     if (!isMouseDown) {
         return;
@@ -182,19 +175,6 @@ function move(e) {
             })
         })
         lines = newLines
-
-        // console.log( circles[focused.key].parent)
-        // if(circles[focused.key].parent){
-        // lines.map((item,index) => {
-
-        //     if(item.parent == circles[focused.key].selfId){
-        //         console.log(item)
-        //         item.x = circles[focused.key].x
-        //         item.y = circles[focused.key].y
-        //     }
-
-        //     console.log(lines)
-        // })
         previousPosition.innerHTML = "";
         previousPosition.append(previousPostionX + "" + previousPostionY)
         currentPosition.innerHTML = "";
@@ -213,8 +193,6 @@ function move(e) {
     draw();
 
 }
-
-//set mousedown state
 function setDraggable(e) {
     var t = e.type;
     if (t === "mousedown") {
@@ -224,13 +202,11 @@ function setDraggable(e) {
         releaseFocus();
     }
 }
-
 function releaseFocus() {
     focused.state = false;
 }
-
 function getMousePosition(e) {
-    var rect = c.getBoundingClientRect();
+    var rect = canvas.getBoundingClientRect();
     mousePosition = {
         x: Math.round(e.x - rect.left),
         y: Math.round(e.y - rect.top)
