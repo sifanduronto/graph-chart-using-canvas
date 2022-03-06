@@ -1,6 +1,6 @@
 var graphValue =
     [{
-        id: 1, title: 1, x: 4, y: 7, child: [
+        id: 1, title: 1, x: 1, y: 1, child: [
             { id: 2, title: 2, x: 2, y: 8 }, { id: 3, title: 3, x: 6, y: 3 }, { id: 4, title: 4, x: 9, y: 9 }
         ]
     },
@@ -15,7 +15,11 @@ var mousePosition;
 
 var isMouseDown;
 
+
 var canvas = document.getElementById("myCanvas");
+var ratio = canvas.width/10;
+
+var baseCircleRadius = canvas.width/20;
 var previousPosition = document.getElementById("previousPostion")
 var currentPosition = document.getElementById("currentPosition")
 var mainCanvas = canvas.getContext("2d");
@@ -26,22 +30,21 @@ document.addEventListener('mouseup', setDraggable, false);
 var circles = [];
 var lines = [];
 graphValue.map(item => {
-    circles.push(new Circle(item.x * 50, item.y * 50, 30, "#25404E", "", true, item.id))
+    circles.push(new Circle(item.x * ratio, item.y * ratio, baseCircleRadius, "#25404E", "", true, item.id))
     item.child.map((children, index) => {
-        lines.push(new line(item.x * 50, item.y * 50, ((children.x * 50)), children.y * 50, item.id, children.id))
-        circles.push(new Circle(children.x * 50, children.y * 50, 30, "#25404E", "", false, children.id))
+        lines.push(new line(item.x * ratio, item.y * ratio, ((children.x * ratio)), children.y * ratio, item.id, children.id))
+        circles.push(new Circle(children.x * ratio, children.y * ratio, baseCircleRadius, "#25404E", "", false, children.id))
     })
 
 })
 //main draw method
 function drawGraph() {
-    start = 50;
-    for (i = 1; i <= 11; i++) {
+    for (i = 1; i <=10; i++) {
         const graphXAxis = canvas.getContext("2d");
         graphXAxis.strokeStyle = "white"
         graphXAxis.beginPath();
-        graphXAxis.moveTo(50, start * i);
-        graphXAxis.lineTo(550, start * i);
+        graphXAxis.moveTo(0, ratio * i+1);
+        graphXAxis.lineTo(canvas.width, ratio * i+1);
         graphXAxis.stroke();
         graphXAxis.lineWidth = 2
         graphXAxis.closePath();
@@ -49,25 +52,29 @@ function drawGraph() {
         const graphYAxis = canvas.getContext("2d");
         graphYAxis.strokeStyle = "white"
         graphYAxis.beginPath();
-        graphYAxis.moveTo(start * i, 50);
-        graphYAxis.lineTo(start * i, 550);
+        graphYAxis.moveTo(ratio * i, 0);
+        graphYAxis.lineTo(ratio * i, canvas.width);
         graphYAxis.stroke();
         graphYAxis.closePath();
-
         const graphAxisTitle = canvas.getContext("2d");
         graphAxisTitle.beginPath();
-        graphAxisTitle.fillText(0, 40, 550);
-        graphAxisTitle.fillText(0, 50, 560);
-        if ((11 - i) % 2 == 0) {
-            graphAxisTitle.fillText(11 - i, 40, 50 * i);
-        }
+
         if (i % 2 == 0) {
-            graphAxisTitle.fillText(i, 50 * i, 560);
+            graphAxisTitle.fillText(i, 2, ratio * i);
+        }
+        console.log(i)
+        if (i % 2 == 0) {
+            
+            graphAxisTitle.fillText(i, ratio * i, 10);
 
         }
         graphAxisTitle.fillStyle = "black"
         graphAxisTitle.closePath()
     }
+    const graphRoot = canvas.getContext("2d");
+    graphRoot.beginPath();
+    graphRoot.fillText(0, 0, 10);
+    graphRoot.closePath()
 }
 
 function draw() {
@@ -75,8 +82,6 @@ function draw() {
     drawGraph()
     drawCircles()
 }
-
-//draw circles
 function drawCircles() {
 
     for (var i = circles.length - 1; i >= 0; i--) {
@@ -87,7 +92,6 @@ function drawCircles() {
     }
 }
 
-//key track of circle focus and focused index
 var focused = {
     key: 0,
     state: false
@@ -124,7 +128,6 @@ function line(x, y, x1, y1, parent, selfId) {
 
     this.x = x;
     this.y = y;
-
     this.x1 = x1;
     this.y1 = y1;
     this.parent = parent
@@ -159,26 +162,25 @@ function move(e) {
 
         graphValue.map(currentItem => {
             if (currentItem.id == circles[focused.key].selfId) {
-                console.log(currentItem.id)
-                currentItem.x = mousePosition.x / 50
-                currentItem.y = mousePosition.y / 50
+                currentItem.x = mousePosition.x / ratio
+                currentItem.y = mousePosition.y / ratio
             }
-            newCircles.push(new Circle(currentItem.x * 50, currentItem.y * 50, 30, "#25404E", "", true, currentItem.id))
+            newCircles.push(new Circle(currentItem.x * ratio, currentItem.y * ratio, baseCircleRadius, "#25404E", "", true, currentItem.id))
             currentItem.child.map(children => {
                 if (children.id == circles[focused.key].selfId) {
-                    children.x = mousePosition.x / 50
-                    children.y = mousePosition.y / 50
+                    children.x = mousePosition.x / ratio
+                    children.y = mousePosition.y / ratio
                 }
-                newLines.push(new line((currentItem.x * 50), currentItem.y * 50, ((children.x * 50)), children.y * 50, currentItem.id, children.id))
-                newCircles.push(new Circle(children.x * 50, children.y * 50, 30, "#25404E", "", false, children.id))
+                newLines.push(new line((currentItem.x * ratio), currentItem.y * ratio, ((children.x * ratio)), children.y * ratio, currentItem.id, children.id))
+                newCircles.push(new Circle(children.x * ratio, children.y * ratio, baseCircleRadius, "#25404E", "", false, children.id))
 
             })
         })
         lines = newLines
         previousPosition.innerHTML = "";
-        previousPosition.append(previousPostionX + "" + previousPostionY)
+        previousPosition.append("X:"+ previousPostionX/ratio + " Y: " + previousPostionY/ratio)
         currentPosition.innerHTML = "";
-        currentPosition.append(previousPostionX + "" + previousPostionY)
+        currentPosition.append("X:" +newPostionX/ratio + " Y: " + newPostionY/ratio)
         draw();
         return;
     }
@@ -213,13 +215,10 @@ function getMousePosition(e) {
     }
 }
 
-//detects whether the mouse cursor is between x and y relative to the radius specified
 function intersects(circle) {
-    // subtract the x, y coordinates from the mouse position to get coordinates 
-    // for the hotspot location and check against the area of the radius
+
     var areaX = mousePosition.x - circle.x;
     var areaY = mousePosition.y - circle.y;
-    //return true if x^2 + y^2 <= radius squared.
     return areaX * areaX + areaY * areaY <= circle.r * circle.r;
 }
 
